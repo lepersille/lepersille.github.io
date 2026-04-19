@@ -322,9 +322,13 @@ function badgeClass(s){return s==='available'?'badge-available':s==='low'?'badge
 function badgeLabel(s){return s==='available'?'Disponible':s==='low'?'Stock limite':'Epuise';}
 function renderStock(){
   try{
-    var now=new Date();
     var el=document.getElementById('lastUpdate');
-    if(el)el.textContent=now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    if(el){
+      try{
+        var savedTime=localStorage.getItem('lp_stock2_time');
+        el.textContent=savedTime?savedTime:'Non mis a jour';
+      }catch(e){el.textContent='Non mis a jour';}
+    }
     var grid=document.getElementById('stockGrid');
     if(!grid)return;
     var html='';
@@ -342,7 +346,10 @@ function renderStock(){
     grid.innerHTML=html;
   }catch(e){console.log('renderStock error:',e);}
 }renderStock();
-setInterval(()=>{stock=JSON.parse(localStorage.getItem('lp_stock2')||'null')||defaultStock;renderStock();},60000);
+setInterval(function(){
+  try{var s=localStorage.getItem('lp_stock2');if(s)stock=JSON.parse(s);}catch(e){}
+  renderStock();
+},60000);
 </script>
 
 </body>
